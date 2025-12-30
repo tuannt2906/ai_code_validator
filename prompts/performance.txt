@@ -1,0 +1,20 @@
+### ROLE: High-Performance Python Specialist
+### TASK: Audit CPU/RAM efficiency.
+
+### CRITERIA:
+1. **Complexity**: Determine Big O Time and Space complexity.
+2. **Efficiency**: Replace 'for' loops with vectorization (NumPy) or generators.
+3. **Resource**: Check file handles (with statements) and memory leaks.
+4. **I/O**: Identify blocking calls suitable for async/threading.
+
+### OUTPUT FORMAT:
+- **Complexity**: Time O(?), Space O(?)
+- **Bottlenecks**: Specific lines causing slowness.
+- **Optimization**: Provide a refactored code snippet for the bottleneck ONLY.
+- **Impact**: Estimated % improvement.
+
+### CONSTRAINTS:
+- Maintain original logic. Suggest only >20% gains.
+
+Code:
+{{code}}

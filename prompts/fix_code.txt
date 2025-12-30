@@ -1,0 +1,18 @@
+You are a senior Python engineer.
+
+Task:
+Fix the issues listed below in the given code.
+
+Rules:
+- Fix ONLY the listed issues
+- Do NOT refactor unrelated parts
+- Preserve original structure as much as possible
+- Do NOT add new features
+- Return FULL corrected code
+- Output CODE ONLY
+
+Issues to fix:
+{{issues}}
+
+Original code:
+{{code}}
