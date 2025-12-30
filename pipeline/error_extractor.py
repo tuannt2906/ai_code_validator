@@ -1,15 +1,35 @@
 import re
 
 def extract_critical_issues(report: dict) -> str:
+    """
+    Extract fixable issues from validator reports.
+    Return plain text list for code-fixing agent.
+    """
+
     issues = []
 
-    if report["syntax"]:
-        issues += re.findall(r"\[(HIGH|MEDIUM)\].*", report["syntax"])
+    # Syntax / best-practice issues
+    syntax = report.get("syntax", "")
+    for line in syntax.splitlines():
+        if "[HIGH]" in line or "[MEDIUM]" in line:
+            issues.append(line.strip())
 
-    if report["logic"]:
-        issues += re.findall(r"(CRITICAL|MAJOR).*", report["logic"])
+    # Logic issues (most important)
+    logic = report.get("logic", "")
+    for line in logic.splitlines():
+        if any(level in line for level in ("CRITICAL", "MAJOR")):
+            issues.append(line.strip())
 
-    if report["performance"]:
-        issues += re.findall(r"O\(.*?\)|inefficient|bottleneck", report["performance"], re.I)
+    # Performance issues (optional but useful)
+    perf = report.get("performance", "")
+    for line in perf.splitlines():
+        if any(
+            keyword in line.lower()
+            for keyword in ("o(", "loop", "inefficient", "vector", "bottleneck")
+        ):
+            issues.append(line.strip())
 
-    return "\n".join(set(issues))
+    # Remove duplicates & join
+    unique = list(dict.fromkeys(issues))
+
+    return "\n".join(unique)

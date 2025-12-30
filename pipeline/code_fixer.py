@@ -1,5 +1,7 @@
 from llm.ollama_client import call_ollama
 from pathlib import Path
+from pipeline.code_sanitizer import strip_code_fences
+
 
 class CodeFixer:
     def __init__(self, model="qwen2.5-coder:7b"):
@@ -12,4 +14,9 @@ class CodeFixer:
             .replace("{{issues}}", issues)
             .replace("{{code}}", code)
         )
-        return call_ollama(self.model, prompt, temperature=0.0)
+
+        raw_output = call_ollama(self.model, prompt, temperature=0.0)
+
+        clean_code = strip_code_fences(raw_output)
+
+        return clean_code
