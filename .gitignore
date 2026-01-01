@@ -1,2 +1,13 @@
 # Ignore the examples folder
 examples/
+
+# Python cache
+__pycache__/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Logs
+*.log
