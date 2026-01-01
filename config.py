@@ -12,8 +12,8 @@ BASE_DIR = Path(__file__).parent
 PROMPT_DIR = BASE_DIR / "prompts"
 
 TIMEOUT_CONFIG = {
-    "syntax": 60,
+    "syntax": 30,
     "performance": 120,
-    "logic": 600,
+    "logic": 480,
     "fix": 240
 }
