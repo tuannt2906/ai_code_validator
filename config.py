@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-MODEL_SYNTAX = "qwen2.5-coder:3b"
+# MODEL_SYNTAX = "qwen2.5-coder:3b"
 MODEL_PERF = "qwen2.5-coder:7b"
 MODEL_LOGIC = "deepseek-r1:7b"
 MODEL_FIXER = "qwen2.5-coder:7b"

@@ -34,3 +34,6 @@ Dùng cho các lỗi logic "cứng đầu" cần DeepSeek suy luận nhiều l�
 PowerShell
 
 python main.py examples/sample_code.py --mode deep
+
+4. Quét folder
+python main.py ./examples --mode audit

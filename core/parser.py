@@ -1,3 +1,4 @@
+# core/parser.py
 import ast
 
 class CodeParser:
@@ -6,39 +7,31 @@ class CodeParser:
         try:
             self.tree = ast.parse(code)
         except SyntaxError:
-            self.tree = None # Đánh dấu code lỗi nặng ngay từ đầu
+            self.tree = None
 
     def is_valid_syntax(self) -> bool:
         return self.tree is not None
 
+    def get_full_code(self) -> str:
+        return self.code
+
     def get_context_blocks(self) -> list[str]:
-        """
-        Lấy các khối code quan trọng: Hàm, Class, và Async Hàm.
-        Bỏ qua các import đơn giản để tiết kiệm token cho LLM.
-        """
         if not self.tree:
-            return [self.code] # Nếu lỗi syntax, trả về nguyên cục để model sửa
+            return [self.code]
 
         blocks = []
         for node in self.tree.body:
-            # Lấy Function, AsyncFunction, Class
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
                 segment = ast.get_source_segment(self.code, node)
-                if segment:
-                    blocks.append(segment)
-            # Lấy khối Main (if __name__ == "__main__":)
+                if segment: blocks.append(segment)
             elif isinstance(node, ast.If) and self._is_main_block(node):
                 segment = ast.get_source_segment(self.code, node)
-                if segment:
-                    blocks.append(segment)
+                if segment: blocks.append(segment)
         
-        # Nếu file quá ngắn hoặc không có hàm/class (script đơn), trả về toàn bộ
-        if not blocks:
-            return [self.code]
+        if not blocks: return [self.code]
         return blocks
 
     def _is_main_block(self, node: ast.If) -> bool:
-        # Check đơn giản cho block __main__
         try:
             return (isinstance(node.test, ast.Compare) and 
                     node.test.left.id == "__name__" and 
@@ -46,5 +39,29 @@ class CodeParser:
         except AttributeError:
             return False
 
-    def get_full_code(self) -> str:
-        return self.code
+    # --- HÀM MỚI: TẠO SKELETON CODE ---
+    def get_skeleton(self) -> str:
+        """
+        Trả về khung sườn code: Giữ lại Class/Function definitions nhưng ẩn nội dung.
+        Giúp AI hiểu ngữ cảnh toàn cục (Global Context) khi check project lớn.
+        """
+        if not self.tree: return self.code
+        
+        lines = self.code.splitlines()
+        skeleton = []
+        
+        for node in self.tree.body:
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                # Lấy dòng definition (ví dụ: def my_func(a, b):)
+                start_line = node.lineno - 1
+                # Chỉ lấy dòng đầu tiên của definition
+                skeleton.append(lines[start_line])
+                skeleton.append("    # ... implementation hidden ...")
+            elif isinstance(node, (ast.Import, ast.ImportFrom)):
+                # Giữ nguyên import
+                skeleton.append(ast.get_source_segment(self.code, node))
+            else:
+                # Các biến global
+                skeleton.append(ast.get_source_segment(self.code, node))
+                
+        return "\n".join(filter(None, skeleton))
